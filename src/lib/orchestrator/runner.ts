@@ -66,6 +66,7 @@ export function findRoute(
   }
 
   // 2) first enabled provider with a model + key for this capability
+  let keylessReason: string | null = null;
   for (const providerId of order) {
     const ps = providerSettings(ctx.settings, providerId);
     if (!ps.enabled) continue;
@@ -75,11 +76,15 @@ export function findRoute(
     if (!model) continue;
     const key = ctx.keys[providerId];
     if (!key) {
-      return { route: null, reason: `${adapter.name} is selected for ${capability} but its API key is missing` };
+      keylessReason ??= `${adapter.name} is selected for ${capability} but its API key is missing`;
+      continue;
     }
     return { route: { providerId, model, key } };
   }
-  return { route: null, reason: `No enabled provider with a ${capability} model and key` };
+  return {
+    route: null,
+    reason: keylessReason ?? `No enabled provider with a ${capability} model and key`,
+  };
 }
 
 function makeTask(

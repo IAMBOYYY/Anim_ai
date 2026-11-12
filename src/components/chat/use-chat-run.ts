@@ -227,7 +227,19 @@ export function useChatRun(tabId: string) {
         toast.success("Creative package ready", { description: storyboard.title });
       } catch (err) {
         if (isAbortError(err)) {
-          mutate((prev) => ({ ...prev, status: "cancelled", endedAt: Date.now() }));
+          mutate((prev) => ({
+            ...prev,
+            status: "cancelled",
+            endedAt: Date.now(),
+            tasks: Object.fromEntries(
+              Object.entries(prev.tasks).map(([k, t]) => [
+                k,
+                t.status === "working" || t.status === "queued"
+                  ? { ...t, status: "failed" as const, error: "Cancelled", endedAt: Date.now() }
+                  : t,
+              ])
+            ),
+          }));
           toast.info("Run cancelled");
           if (dataRef.current.storyboard) void finalize(dataRef.current);
         } else {

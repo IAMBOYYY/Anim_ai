@@ -161,9 +161,10 @@ export function availableRoutes(
   capability: Capability
 ): { providerId: string; model: string; label: string }[] {
   const out: { providerId: string; model: string; label: string }[] = [];
-  for (const [providerId, ps] of Object.entries(settings.providers)) {
-    if (!ps.enabled) continue;
-    const model = ps.models[capability];
+  const entries: [string, ProviderSettings][] = Object.entries(settings.providers ?? {});
+  for (const [providerId, ps] of entries) {
+    if (!ps?.enabled) continue;
+    const model = ps.models?.[capability];
     if (model) out.push({ providerId, model, label: `${providerId} · ${model}` });
   }
   return out;

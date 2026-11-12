@@ -90,6 +90,19 @@ export function SettingsTab() {
       const models = await adapter.listModels(key.trim());
       setModelCache((c) => ({ ...c, [providerId]: { models, fetchedAt: Date.now() } }));
       if (keyOverride) await saveProviderKey(providerId, key.trim());
+
+      // convenience: pre-select the first model of each capability not yet chosen
+      const currentPs = settings.providers[providerId] ?? { enabled: true, models: {} };
+      if (Object.keys(currentPs.models).length === 0 && models.length) {
+        const groups = groupByCapability(models);
+        const seeded: Record<string, string> = {};
+        for (const cap of adapter.capabilities) {
+          if (groups[cap]?.length) seeded[cap] = groups[cap][0].id;
+        }
+        if (Object.keys(seeded).length) {
+          await updateSettings({ providers: { ...settings.providers, [providerId]: { ...currentPs, models: seeded } } });
+        }
+      }
       toast.success(`${adapter.name}: ${result.message ?? "key valid"}`, {
         description: `${models.length} models loaded`,
       });
