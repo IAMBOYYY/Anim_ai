@@ -84,9 +84,15 @@ export const ProviderSettingsSchema = z.object({
 });
 export type ProviderSettings = z.infer<typeof ProviderSettingsSchema>;
 
+export const DefaultRouteSchema = z.object({
+  providerId: z.string(),
+  model: z.string(),
+});
+
 export const AppSettingsSchema = z.object({
   id: z.literal("app"),
   providers: z.record(z.string(), ProviderSettingsSchema).default({}),
+  defaults: z.record(z.string(), DefaultRouteSchema).default({}),
   style: StyleSchema.default("cinematic"),
   sceneCount: z.number().int().min(2).max(16).default(6),
   autoDownload: z.boolean().default(false),
@@ -98,6 +104,7 @@ export type AppSettings = z.infer<typeof AppSettingsSchema>;
 export const DEFAULT_SETTINGS: AppSettings = {
   id: "app",
   providers: {},
+  defaults: {},
   style: "cinematic",
   sceneCount: 6,
   autoDownload: false,
@@ -145,4 +152,19 @@ export function resolveRoute(
 
 export async function listSettings(): Promise<AppSettings[]> {
   return idbGetAll<AppSettings>("settings");
+}
+
+
+/** All configured (provider, model) pairs for a capability — for the default-routing picker. */
+export function availableRoutes(
+  settings: AppSettings,
+  capability: Capability
+): { providerId: string; model: string; label: string }[] {
+  const out: { providerId: string; model: string; label: string }[] = [];
+  for (const [providerId, ps] of Object.entries(settings.providers)) {
+    if (!ps.enabled) continue;
+    const model = ps.models[capability];
+    if (model) out.push({ providerId, model, label: `${providerId} · ${model}` });
+  }
+  return out;
 }

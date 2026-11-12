@@ -6,10 +6,10 @@ import { Lock, Moon, Sun, Zap } from "lucide-react";
 import { useWorkspace, TAB_META } from "./store";
 import { TabBar, TabHint } from "./tab-bar";
 import { Button } from "@/components/ui/button";
-import { ChatTab } from "@/tabs/chat-tab";
-import { SettingsTab } from "@/tabs/settings-tab";
-import { FilesTab } from "@/tabs/files-tab";
-import { ViewerTab } from "@/tabs/viewer-tab";
+import { ChatTab } from "@/components/tabs/chat-tab";
+import { SettingsTab } from "@/components/tabs/settings-tab";
+import { FilesTab } from "@/components/tabs/files-tab";
+import { ViewerTab } from "@/components/tabs/viewer-tab";
 import { UnlockDialog } from "./unlock-dialog";
 import { useKeyboardShortcuts } from "./shortcuts";
 

@@ -9,6 +9,13 @@ export interface ProxyRequest {
   body?: string;
 }
 
+export interface ProxyInit {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string;
+  signal?: AbortSignal;
+}
+
 /**
  * All provider traffic goes through the stateless /api/proxy route.
  * The key travels with the request and is never stored or logged server-side.
@@ -20,7 +27,7 @@ export async function proxyFetch(
   const opts: { url: string; init: ProxyInit } =
     typeof input === "string" ? { url: input, init: init ?? {} } : { url: input.url, init: input.init ?? init ?? {} };
 
-  const { url, method = "GET", headers = {}, body, signal } = opts.init;
+  const { method = "GET", headers = {}, body, signal } = opts.init;
 
   const payload: ProxyRequest = {
     url: opts.url,

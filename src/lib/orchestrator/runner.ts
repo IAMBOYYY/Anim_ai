@@ -53,6 +53,19 @@ export function findRoute(
   capability: Capability
 ): { route: CapabilityRoute | null; reason?: string } {
   const order = Object.keys(ctx.settings.providers);
+
+  // 1) explicit default chosen by the user in Settings → Default routing
+  const explicit = ctx.settings.defaults?.[capability];
+  if (explicit) {
+    const ps = providerSettings(ctx.settings, explicit.providerId);
+    const adapter = getAdapter(explicit.providerId, { customBaseUrl: ps.customBaseUrl });
+    const key = ctx.keys[explicit.providerId];
+    if (ps.enabled && adapter?.capabilities.includes(capability) && ps.models[capability] === explicit.model && key) {
+      return { route: { providerId: explicit.providerId, model: explicit.model, key } };
+    }
+  }
+
+  // 2) first enabled provider with a model + key for this capability
   for (const providerId of order) {
     const ps = providerSettings(ctx.settings, providerId);
     if (!ps.enabled) continue;

@@ -1,3 +1,4 @@
+import { fetchJsonViaProxy } from "./openai-compat";
 import { proxyFetch, readErrorDetail, readSSE, throwProviderError, withRetry } from "./http";
 import type {
   AudioRequest,

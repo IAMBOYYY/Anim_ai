@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTheme } from "next-themes";
 import {
   listKeyRecords,
   readAllKeys,
@@ -38,7 +39,6 @@ export const TAB_META: Record<TabType, { title: string; icon: string; singleton:
 
 const TABS_KEY = "animai.tabs.v1";
 const ACTIVE_KEY = "animai.activeTab.v1";
-const THEME_KEY = "animai.theme";
 
 function loadTabs(): { tabs: TabState[]; activeId: string } {
   try {
@@ -124,8 +124,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   }));
   const [projects, setProjects] = React.useState<ProjectSummary[]>([]);
   const [currentProjectId, setCurrentProjectId] = React.useState<string | null>(null);
-  const [theme, setTheme] = React.useState<"light" | "dark">("dark");
   const passphraseRef = React.useRef<string | null>(null);
+  const { theme, setTheme } = useTheme();
 
   // initial load
   React.useEffect(() => {
@@ -155,16 +155,6 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
           }
         }
 
-        try {
-          const storedTheme = localStorage.getItem(THEME_KEY) as "light" | "dark" | null;
-          const initial = storedTheme ?? "dark";
-          if (!cancelled) {
-            setTheme(initial);
-            document.documentElement.classList.toggle("dark", initial === "dark");
-          }
-        } catch {
-          /* ignore */
-        }
       } finally {
         if (!cancelled) setReady(true);
       }
@@ -315,17 +305,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTheme = React.useCallback(() => {
-    setTheme((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      document.documentElement.classList.toggle("dark", next === "dark");
-      try {
-        localStorage.setItem(THEME_KEY, next);
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
-  }, []);
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }, [setTheme]);
 
   // make sure active tab id is valid
   React.useEffect(() => {
@@ -361,7 +342,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     currentProjectId,
     setCurrentProjectId,
     refreshProjects,
-    theme,
+    theme: theme === "light" ? "light" : "dark",
     toggleTheme,
   };
 
