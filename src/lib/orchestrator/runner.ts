@@ -232,7 +232,7 @@ export async function runPlanner(ctx: RunContext): Promise<Storyboard | null> {
 
 /* ---------------- Writer ---------------- */
 
-export async function runWriter(ctx: RunContext, storyboard: Storyboard): Promise<Storyboard | null> {
+export async function runWriter(ctx: RunContext, storyboard: Storyboard): Promise<Storyboard> {
   const routeInfo = findRoute(ctx, "text");
   const task = makeTask("writer", "Writer", routeInfo.route, "Polish narration & captions");
   if (!routeInfo.route) {

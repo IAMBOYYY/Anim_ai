@@ -5,7 +5,6 @@ import { useTheme } from "next-themes";
 import {
   listKeyRecords,
   readAllKeys,
-  readKey,
   removeKey as dbRemoveKey,
   saveKey as dbSaveKey,
   isPassphraseProtected,
@@ -305,8 +304,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTheme = React.useCallback(() => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  }, [setTheme]);
+    setTheme(theme === "dark" ? "light" : "dark");
+  }, [theme, setTheme]);
 
   // make sure active tab id is valid
   React.useEffect(() => {
